@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>单列布局——header、content、footer等宽</title>
+    <style>
+        html,body {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        .clearfix{
+            zoom: 1
+        }
+        .clearfix:after {
+            display: block;
+            clear: both;
+            content: '';
+            visibility: hidden;
+            height: 0;
+        }
+        .wrap {
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .wrap1, .wrap2 {
+            width: 47%;
+            margin-right: 6%;
+            float: left;
+        }
+        .wrap2 {
+            margin-right: 0;
+        }
+        header, main, footer {
+            border: 1px solid #dddee1;
+            box-shadow: 0 5px 10px #ddd;
+            height: 100px;
+            background: silver;
+            text-align: center;
+            max-width: 650px;
+            margin: 0 auto;
+        }
+        main {
+            height: 500px;
+        }
+        .wrap2 main {
+            max-width: 500px;
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="wrap clearfix">
+        <div class="wrap1">
+            <header>
+                header
+            </header>
+            <main>
+                header、main、footer等宽
+            </main>
+            <footer>
+                footer
+            </footer>
+        </div>
+        <div class="wrap2">
+            <header>
+                header
+            </header>
+            <main>
+                header、footer等宽，main宽度较短
+            </main>
+            <footer>
+                footer
+            </footer>
+        </div>
+    </div>
+</body>
+</html>

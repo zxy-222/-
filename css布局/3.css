@@ -1,0 +1,112 @@
+.clearfix{
+    zoom: 1
+}
+.clearfix:after {
+    display: block;
+    content: '';
+    clear: both;
+    visibility: hidden;
+    height: 0;
+}
+html,body {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+}
+.wrap {
+    width: 100%;
+    padding: 50px;
+    box-sizing: border-box;
+}
+.section1, .section2, .section3, .section4, .section5{
+    /* background: lightslategrey; */
+}
+.left{
+    background: lightseagreen;
+}
+.right {
+    background: lightsalmon;
+}
+.center {
+    background: lightgreen;
+}
+.section1 .left {
+    float: left;
+    width: 150px;
+}
+.section1 .right {
+    float: right;
+    width: 150px;
+}
+.section1 .center {
+    margin: 0 150px;
+}
+.section2 {
+    position: relative;
+}
+.section2 .left,.section2 .right{
+    position: absolute;
+    top: 0;
+    width: 150px;
+}
+.section2 .left {
+    left: 0;
+}
+.section2 .right {
+    right: 0;
+}
+.section2 .center {
+    margin: 0 150px;
+}
+.section3{
+    display: flex;
+}
+.section3 .left, .section3 .right{
+    width: 150px;
+    flex-shrink: 0;
+}
+.section3 .center {
+    flex: 1;
+    word-break: break-all;
+}
+.section4 {
+    padding: 0 150px;
+}
+.section4 .left, .section4 .right, .section4 .center {
+    float: left;
+}
+.section4 .left{
+    width: 150px;
+    margin-left: -100%;
+    position: relative;
+    left: -150px;
+}
+.section4 .right{
+    width: 150px;
+    margin-left: -150px;
+    position: relative;
+    right: -150px;
+}
+.section4 .center {
+    width: 100%;
+}
+
+.section5 .center {
+    float: left;
+    width: 100%;
+
+}
+.section5 .center .center-inner {
+    margin: 0 150px;
+}
+.section5 .left {
+    width: 150px;
+    float: left;
+    margin-left: -100%;
+}
+.section5 .right {
+    width: 150px;
+    float: left;
+    margin-left: -150px;
+}
