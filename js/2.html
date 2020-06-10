@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>call 、 apply、 bind的区别</title>
+</head>
+<body>
+    
+</body>
+<script>
+    let name = 'lili', age = 17;
+
+    let obj = {
+        name: 'huhu',
+        objAge: this.age, // 此时的this指向全局
+        func: function() {
+            console.log(this.name + ',' + this.age) // 此时this指向调用该函数的对象，即obj
+        }
+    } 
+    console.log(obj.objAge) // 17
+    console.log(obj.func()) // huhu , undefined
+    /**
+        call、apply、bind
+    */
+    let globalObj = {
+        name: 'gloal',
+        age: 0,
+    }
+    let o = {
+        name: 'oo',
+        age: 11,
+        func: function(nick_name, job) {
+            console.log(`姓名：${this.name}，年龄：${this.age}，昵称：${nick_name}，工作：${job}`)
+        }
+    }
+    console.log(o.func('nick','啥也不是')) 
+
+    // call
+    console.log(o.func.call(globalObj, 'call','改变this指向'))
+
+    // apply
+    console.log(o.func.apply(globalObj, ['apply','改变this指向']))
+
+    // bind
+    console.log(o.func.bind(globalObj, ['bind', '改变this指向'])())
+
+    // call 和apply的唯一区别就是apply传参第二个为数组，call挨个传递
+
+    // bind和apply的传参方式一样，不过bind方法返回的是一个this指向已经变化的函数，需要手动调用一下
+
+    let book = {
+            _year: 2020,
+            edition: 1
+        }
+        Object.defineProperty(book, 'year', {
+            get: function() {
+                return this._year
+            },
+            set: function(newValue) {
+                if(newValue > 2020) {
+                    this._year = newValue
+                    this.edition = 2
+                }
+            }
+        })
+    book.year = 2022
+    console.log(book)
+</script>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>基本类型和引用类型</title>
+</head>
+<body>
+    <div>
+        大江东去，浪淘尽，千古风流人物。<br>
+        故垒西边，人道是，三国周郎赤壁。<br>
+
+
+    </div>
+</body>
+<script>
+    /**1、动态属性 --- 可以为引用类型添加属性和方法，但却不能为基本类型的值添加属性*/
+    //例如：
+    // - 引用类型 -----只要我们不销毁这个对象或者删除这个属性，这个属性将一直存在
+    let person = new Object()
+    person.name = '王二小'
+    console.log(person.name) // 王二小
+
+    // 基本类型  --- 尽管可以为基本添加属性，不会报错，但却访问不到这个属性
+    let name = '王小二'
+    name.age = 18
+    console.log(name.age)  // undefined
+
+    /**
+    2、复制变量值 ---- 二者都是都是从一个变量中复制值到另一个变量中；不同的是引用类型复制的其实是一个指针，指向存储在堆中的一个对象
+    */
+
+    // 基本类型 当复制变量完成后，二者任何操作互不影响
+    let num1 = 1;
+    let num2 = num1
+    console.log(num2) // 1
+    num1 = 3
+    num2 = 2
+    console.log(num1) // 3
+    console.log(num2) // 2
+
+    // 引用类型
+    let obj1 = new Object()
+    let obj2 = obj1
+    obj1.name = '周一'
+    console.log(obj2.name) // '周二'
+
+    /**
+        传递参数
+    */
+    // 基本类型 按值传递
+    // function addTen(num) {
+    //     num += 10;
+    //     return num
+    // }
+</script>
+</html>
