@@ -91,8 +91,7 @@
 
         - 函数内部属性
 
-            - ``arguments``：用于保存函数参数，该对象还有一个 ``callee``属性，该属性是一个指针，指向拥有这个 ``arguments``对象的函数
-
+            - ``arguments`` ：用于保存函数参数，该对象还有一个 ``callee``属性，该属性是一个指针，指向拥有这个 ``arguments``对象的函数
 
             - ``this``：其引用的是函数据以执行的环境对象，当在全局作用域中调用函数，``this``对象引用的是 ``window``
 
@@ -132,9 +131,6 @@
     - 基本包装类型
 
         - ``ECMAScript`` 还提供了3个特殊的引用类型：``Boolean`` 、``Number`` 、``String``
-
-
-
     - 转换方法
         
         - 所有对象都具有 ``toLocaleString()``、``toString()`` 、 ``valueOf()``方法。
@@ -186,6 +182,7 @@
 
 
 ##### 二、 执行环境、作用域、作用域链
+
 - 执行环境
 
     - 定义了变量或函数有权访问的其他数据，决定了它们各自的行为
@@ -392,14 +389,98 @@
 
     - 组合使用构造函数和原型模式
 
+        - 构造函数模式用于定义实例属性，而原型用于定义方法和共享的属性
+
+        - 每个实例都会有自己的一份实例属性的副本，但同时又共享着对方法的引用，最大限度地节省了内存。
+
+        - 这种模式还支持向构造函数传递参数，是目前使用最广泛的一种创建自定义类型的方法
+
+        ```
+        function Person(name, age, job) {
+            this.name = name;
+            this.age = age;
+            this.job = job;
+            this.firends = ['shelby', 'court']
+        }
+        Person.prototype = {
+            constructor: Person,
+            sayName: function() {
+                console.log(this.name)
+            }
+        }
+        let person1 = new Person('Nicholas', 19, 'Engineer')
+        let person2 = new Person('Greg', 25, 'Doctor')
+
+        person1.friends.push('van')
+
+        console.log(person1.friends)    // ['shelby', 'court', 'van']
+
+        console.log(person2.friends)    // ['shelby', 'court']
+
+        console.log(person1.friends === person2.friends)    // false
+
+        console.log(person1.sayName === person2.sayName)    // true
+
+        ```
+
     - 动态原型模式
+
+        - 把所有信息都封装在构造函数中，而通过在构造函数中初始化原型（仅在必要的情况下），又保持了同时使用构造函数和原型的有点。可以通过检查某个应该存在的方法是否有效，来决定是否需要初始化邮箱奶奶个
+
+            ```
+            function Person(name, age, job) {
+                // 属性
+                this.name = name
+                this.age = age
+                this.job = job
+
+                // 方法
+                if(typeof this.sayName != 'function') {
+                    Person.prototype.sayName = function() {
+                        console.log(this.name)
+                    }
+                }
+            }
+            ```
+
+        - 使用动态原型模式时，不能使用对象字面量重写原型
 
     - 寄生构造函数模式
 
+        - 这种模式基本思想是创建一个函数，该函数的作用仅仅是封装创建对象的代码，然后再返回创建新创建的对象；但从表面上看，这个函数又像是典型的构造函数
+
+            ```
+            function Person(name, age, job) {
+                let o = new Object();
+                o.name = name;
+                o.age = age;
+                o.job = job;
+                o.sayName = function() {
+                    console.log(this.name)
+                }
+                return o
+            }
+
+            let friends = new Person('Nicholas', 18, 'Engineer')
+
+            除了使用new操作符并把使用的包装函数叫做构造函数之外，这个模式和工厂模式是一样的
+            ```
+
+        - 这种模式返回的对象与构造函数后者与构造函数的原型属性之间没关系；也就是说，构造函数返回的对象与在构造函数外部创建的对象没什么不同，所以不能依赖 ``instanceof`` 操作符来确定对象的类型。所以在可以使用其他模式的情况下，不要使用该模式
+
     - 稳妥构造函数模式
 
-- 继承
-##### 一、原型对象
+        - 稳妥对象：指的是没有公共属性，而且其方法也不引用 ``this`` 的对象。
+
+        - 适合在一些安全环境中（这些环境中会禁止使用 ``this`` 和 ``new``），或者在防止数据被其他应用程序改动时使用。
+
+        - 该模式构造函数与寄生构造函数模式类似：但有两点不同
+
+            - 新创建的对象的实例方法不引用 ``this``
+
+            - 不使用 ``new`` 操作符调用构造函数 
+
+##### 四、原型对象
 
 - 原型对象
 
@@ -541,7 +622,7 @@
             ```
     - 原型的动态性
 
-        - 在原型上查找值的过程试一次搜索，因此我们对原型对象所做的任何修改都能够立即从市里上反映出来，即使是先创建实例后修改原型也是如此
+        - 在原型上查找值的过程试一次搜索，因此我们对原型对象所做的任何修改都能够立即从实例上反映出来，即使是先创建实例后修改原型也是如此
 
             ```
             let p2 = new Person()
@@ -551,8 +632,219 @@
             p2.sayHi()    // 'hi'
             
             这是由于实例与原型之间的松散连接关系，当调用
-            
+            person.sayHi()时，首先会在实例中搜索名为sayHi 的属性，找不到会继续搜索原型。实例和原型之间的链接不过是一个指针，但如果我们重写整个原型对象，则情况便不是如此了。
+
+            当我们调用构造函数时会为实例添加一个指向最初原型的 [[Prototype]]指针，而把原型修改为另一个对象就等于切断了构造函数与最初原型之间的联系。实例中的指针仅指向原型，而不是构造函数
+
+            function Person() {
+
+            }
+            let p1 = new Person()
+
+            Person.prototype = {
+                constructor: Person,
+                name: 'Nicholas',
+                age: 18,
+                sayName: function() {
+                    console.log(this.name)
+                }
+            }
+            p1.sayName // typeError
+
+            这是我们先创建了 Person的实例，然后又重写了其原型对象，而这个实例的指针指向的是原先的原型对象，而不是重写后的，所以会报错
             ```
+    
+    - 原生对象的原型
+
+        - 原型模式的重要性不仅体现在创建自定义类型方面，所有原生的引用类型，都是采用这种模式创建的。所有原生引用类型（``Object`` 、``Array``、``String``等）都在其构造函数的原型上定义了方法。
         
+    - 原型对象问题
+
+        - 问题其一是它省略了为构造函数传递初始化参数的环节，结果所有实例在默认情况下都将取得相同的属性值。
+
+        - 最大的问题是原型中所有属性是被很多实例共享的，这种共享对于函数非常合适，对于那些包含基本值的属性也说得过去，毕竟可以在实例上可以添加一个同名属性，来屏蔽掉原型属性，而对于包含引用类型值的属性来说，就有很大问题了
+
+            ```
+            function Person() {
+
+            }
+            Person.prototype = {
+                constructor: Person,
+                name: 'Nicholas',
+                friends: ['shelby', 'court'],
+            }
+            let p1 = new Person()
+            let p2 = new Person()
+
+            p1.friends.push('Van')
+
+            console.log(p1.friends) // ['shelby', 'court','van']
+
+            console.log(p2.friends) // ['shelby', 'court','van']
+            ```
+
+##### 五、继承
+
+``ECMAScript`` 只支持实现继承，而且其实现继承的主要是靠原型链来实现的
+
+- 原型链
+
+    - 基本思想是利用原型让一个引用类型继承另一个引用类型的属性和方法
+
+        ```
+        实现原型链的一种基本模式
+
+            fucntion SuperType() {  // 超类型构造函数
+                this.property = true
+            }
+
+            SuperType.prototype.getSuperValue = fucntion() { //超类型原型添加方法
+                return this.property;
+            }
+
+            function SubType() { // 子类型构造函数
+                this.subproperty = false
+            }
+
+            //继承超类型 SuperType
+            SubType.prototype = new SuperType() // 将超类型的实例对象设为子类型的原型对象
+
+            SubType.prototype.getSubValue = function() { //子类型原型添加方法
+                return this.subproperty;
+            }
+
+            let subObj = new SubType()
+            console.log(subObj.getSuperValue()) // true 继承超类型的getSuperValue方法
+        ```
+    - 以上代码中，``SubType`` 没有使用默认提供的原型，而是赋值一个新的原型；这个新原型就是 ``SuperType`` 的实例。所以这个新原型不仅拥有 ``SuperType`` 的实例的全部属性和方法，而且内部还有一个指针，指向了 ``SuperType`` 的原型。所以 ``subObj`` 指向 ``SubType`` 的原型，``SubType`` 的原型又指向 ``SuperType``的原型。所以可以访问到 ``property`` 属性。但是，``subObj.constructor`` 现在的指向是 ``SuperType``，这是因为 ``SubType.prototype`` 被重写了，指向另一个对象 ``SuperType.prototype``，所以 ``constructor`` 属性的指向是 ``SuperType``
+
+    - 还有需要注意的是，在通过原型链实现继承时，不能使用对象字面量创建原型方法。这样做会重写原型链
+
+    - 问题
+
+        - 主要的问题是来自包含引用类型值的原型
+
+            ```
+            function SuperType() {
+                this.colors = ['red', 'blue', 'green']
+            }
+
+            function SubType() {
+
+            }
+
+            SubType.prototype = new SuperType()
+            
+            let o1 = new SubType()
+            o1.colors.push('white')
+            console.log(o1) // 'red', 'blue', 'green', 'white'
+
+            let o2 = new SubType()
+
+            console.log(o2) // 'red', 'blue', 'green', 'white'
+
+            ```
+
+        - 再就是，创建子类型的实例时，不能向超类型的构造函数中传递参数。所以实践中很少单独使用原型链
+
+- 借用构造函数（也叫做伪造对象或者经典继承）
+
+    - 这种技术的基本思想是，在子类型构造函数的内部调用超类型的构造函数
+
+        ```
+        function SuperType() {
+            this.colors = ['red', 'blue', 'green']
+        }
+
+        function SubType() {
+            //继承 SuperType
+            SuperType.call(this)
+        }
+
+        let o1 = new SubType()
+        o1.colors.push('white')
+        console.log(o1) // 'red', 'blue', 'green', 'white'
+
+        let o2 = new SubType()
+        console.log(o2) // 'red', 'blue', 'green'
+        
+        以上代码通过call方法，实际上在新创建 SubType 的实例的环境下调用了 SuperType 构造函数；这样，SubType 的每个实例都会有自己的 colors 属性的副本了
+
+        ```
+
+    - 传递参数
+
+        ```
+        function SuperType(name) {
+            this.name = name
+        }
+
+        function SubType() {
+            //继承 SuperType
+            SuperType.call(this, 'Nicholas')
+            this.age = 29
+        }
+
+        let o1 = new SubType()
+        console.log(o1.name) // 'Nicholas'
+        console.log(o1.age)  // 29
+
+        ```
+
+    - 问题
+
+        - 借用构造函数，也就无法避免构造函数模式存在的问题 ———— 方法都在构造函数中定义，函数复用就无从说起了
+
+        - 超类型的原型中定义的方法，对子类型而言也是不可见的，结果所有类型都只能使用构造函数模式。所以这种模式也很少单独使用
+
+- 组合继承（或者伪经典继承）
+
+    - 指的是将原型链和借用构造函数的技术组合到一块
+
+    - 使用原型链实现对原型属性和方法的继承，通过借用构造函数来实现对实例属性的继承
+
+        ```
+        function SuperType(name) {
+            this.name = name;
+            this.colors = ['red', 'blue', 'green']
+        }
+        SuperType.prototype.sayName = function() {
+            console.log(this.name)
+        }
+
+        function SubType(name, age) {
+            //继承属性
+            SuperType.call(this, name)
+            this.age = age
+        }
+
+        // 继承方法
+        SubType.prototype = new SuperType()
+        SubType.prototype.constructor = SubType()
+        SubType.prototype.sayAge = function() {
+            console.log(this.age)
+        }
+
+        let o1 = new SubType('Nicholas', 29)
+        o1.colors.push('black')
+        console.log(o1.colors) // 'red', 'blue', 'green', 'black'
+        o1.sayName() // 'Nicholas'
+        o1.sayAge()  // 29
+
+        let o2 = new SubType('Greg', 18)
+        console.log(o2.colors) // 'red', 'blue', 'green'
+        o2.sayName() // 'Greg'
+        o2.sayAge() // 18
+
+        ```
+
+- 原型式继承
+
+    
+
+- 寄生式继承
+
+- 寄生组合式继承
+
 ##### 二、闭包、作用域、垃圾回收机制
 ##### 三、
