@@ -37,32 +37,32 @@
 
         - 创建 ``Object`` 实例的方式有两种
 
-        ```
-        1、使用new + 构造函数
+            ```
+            1、使用new + 构造函数
 
-            let person = new Object()
+                let person = new Object()
 
-        2、对象字面量表示法
+            2、对象字面量表示法
 
-            let person = {
-                name: 'lili'
-            }
-        ```
+                let person = {
+                    name: 'lili'
+                }
+            ```
     - Array
 
         - 创建 ``Array``的方式也有两种
 
-        ```
-        1、new + Array , 可是省略 new
+            ```
+            1、new + Array , 可是省略 new
 
-            let arr = new Array() 
-            或
-            let arr = Array() 
+                let arr = new Array() 
+                或
+                let arr = Array() 
 
-        2、字面量表示法
+            2、字面量表示法
 
-            let arr = []
-        ```
+                let arr = []
+            ```
         
         - 检测数组可以使用 ``Array.isArray()``
         
@@ -72,22 +72,22 @@
 
         - 函数定义的方式
 
-        ```
-        1、 函数声明
+            ```
+            1、 函数声明
 
-            function sum (num1, num2) {
-                return num1 + num2
-            }
+                function sum (num1, num2) {
+                    return num1 + num2
+                }
 
-        2、 函数表达式
+            2、 函数表达式
 
-            let sum  = function (num1, num2) {
-                return num1 + num2
-            }
-        
-        3、 Function构造函数
-            let sum = new Function("num1", "num2", "return num1 + num2")    //不推荐
-        ``` 
+                let sum  = function (num1, num2) {
+                    return num1 + num2
+                }
+
+            3、 Function构造函数
+                let sum = new Function("num1", "num2", "return  num1 + num2")    //不推荐
+            ``` 
 
         - 函数内部属性
 
@@ -112,22 +112,22 @@
 
             - ``call`` 和 ``apply`` 方法作用相同，它们的区别仅在于接收参数的方式不同，第一个参数还是 ``this``值，其余的参数不再是数组，而是全部列出来，依次传给函数
 
-            ```
-            let name = 'lili', age = 18;
+                ```
+                let name = 'lili', age = 18;
 
-            let obj = {
-                name: 'huhu',
-                objAge: this.age, // 此处this指向全局
-                func: function(){
-                    console.log(this.name + ',' + this.age) // 此处 this 指向obj
+                let obj = {
+                    name: 'huhu',
+                    objAge: this.age, // 此处this指向全局
+                    func: function(){
+                        console.log(this.name + ',' + this.age) /   / 此处 this 指向obj
+                    }
                 }
-            }
-            obj.objAge // 18
-            obj.func() // huhu, undefined
+                obj.objAge // 18
+                obj.func() // huhu, undefined
 
-            //call
-            obj.func.call()
-            ```
+                //call
+                obj.func.call()
+                ```
 
     - 基本包装类型
 
@@ -232,39 +232,163 @@
     
     - 修改属性时不能直接定义，必须使用  ``Object.defineProperty()`` 来定义，其定义的属性默认值都为 ``false``
 
-    ```
-        let person = {}
-        Object.defineProperty(person, 'name', {
-            configurable: false,
-            value: 'nicholas'
-        })
-        
-        let book = {
-            _year: 2020,
-            edition: 1
-        }
-        Object.defineProperty(book, 'year', {
-            get: function() {
-                return this._year
-            },
-            set: function(newValue) {
-                if(newValue > 2020) {
-                    this._year = newValue
-                    this.edition = 2
-                }
+        ```
+            let person = {}
+            Object.defineProperty(person, 'name', {
+                configurable: false,
+                value: 'nicholas'
+            })
+
+            let book = {
+                _year: 2020,
+                edition: 1
             }
-        })
-        book.year = 2022
-        console.log(book) //{_year: 2022, edition: 2}
-    ```
+            Object.defineProperty(book, 'year', {
+                get: function() {
+                    return this._year
+                },
+                set: function(newValue) {
+                    if(newValue > 2020) {
+                        this._year = newValue
+                        this.edition = 2
+                    }
+                }
+            })
+            book.year = 2022
+            console.log(book) //{_year: 2022, edition: 2}
+        ```
 
 - 创建对象
 
     - 工厂模式
 
+        ```
+            function createPerson(name, age, job) {
+                var o = new Object()
+                o.name = name
+                o.age = age
+                o.job = job
+                o.sayName = function() {
+                    console.log(this.name)
+                }
+                return o
+            }
+            let person1 = createPerson('Nicholas', 17, 'engineer')
+            let person2 = createPerson('Greg', 18, 'Doctor')
+        ```
+
+        - 优点： 解决了创建多个相似对象的问题
+
+        - 缺点：没有解决对象识别的问题（即怎样知道一个对象的类型）
+
+        
     - 构造函数模式
+    
+        ```
+            function Person(name, age, job) {
+                this.name = name
+                this.age = age
+                this.job = job
+                this.sayName = function() {
+                    console.log(this.name)
+                }
+            }
+            let person1 = new Person('Nicholas', 17, 'engineer')
+            let person2 = new Person('Greg', 18, 'Doctor')
+        ```
+
+        - 与工厂模式相比：
+
+            - 没有显示地创建对象
+
+            - 直接将属性方法赋给了 ``this`` 对象
+
+            - 没有 ``return`` 语句
+       
+        - 创建 ``Person``新实例，要一下4个步骤
+
+            - 创建一个对象
+
+            - 将构造函数的作用域赋给新对象（this就指向这个新对象）
+
+            - 执行构造函数中的代码（即为这个新对象添加属性）
+
+            - 返回新对象
+
+        - ``person1`` 和 ``person2`` 两个对象都有一个 ``constructor`` （构造函数）属性，该属性指向 ``Person`` 
+
+        - 优点： 创建自定义的构造函数意味着将来可以将它的实例标识为一种特定的类型，这就是胜过工厂模式的地方
+
+        - 缺点：每个方法都要在实例上重新创建一遍
+
+            - ``person1`` 和 ``person2`` 都有一个 ``sayName()`` 的方法，但这两个方法不是同一个 ``Function`` 的实例，因为 ``ECMAScript`` 中的函数是对象，所以每定义一个函数，也就是实例化了一个对象。因此，构造函数可以如下定义
+
+                ```
+                function Person(name, age, job) {
+                    this.name = name
+                    this.age = age
+                    this.job = job
+                    this.sayName = new Function(console.log(this.name)) // 与声明函数在逻辑上是等价的
+                }、
+
+                以这种方式创建函数，会导致不同的作用域链和标识符解析，但创建 Function 新实例的机制是相同的。 所以不同实例上的同名函数是不相等的。如下：
+
+                console.log(person1.sayName == person2.sayName) // false
+                ```
+
+            - 以上创建两个同样任务的 ``Function`` 实例确实没必要；而且有 ``this`` 对象在，不需要在执行代码前就把函数绑定到特定对象上，可以通过如下解决
+
+                ```
+                function Person (name, age, job) {
+                    this.name = name;
+                    this.age = age;
+                    this.job = job;
+                    this.sayName = sayName;
+                }
+
+                function sayName() {
+                    console.log(this.name)
+                }
+
+                let person1 = new Person('Nicholas', 17, 'engineer')
+                let person2 = new Person('Greg', 18, 'Doctor')
+
+                sayName包含的是一个指向函数的指针，所以person1 和 person2 对象就共享了在全局作用域中定义的同一个sayName() 函数
+                ```
+            - 以上这种做法，虽然解决了一些问题；但又引来其他问题
+
+                - 在全局作用域中定义的函数实例上只能被某些对象调用，这让全局作用域名不副实
+
+                - 如果对象需要定义多个方法，那就要定义多个全局函数，没什么封装性可言
 
     - 原型模式
+
+        - 我们创建的每个函数都有一个 ``prototype（原型）``属性，这个属性是一个指针，指向一个对象，而这个对象的用途就是包含可以由特定类型的所有实例共享的属性和方法。从字面意思理解，``prototype``就是通过调用构造函数而创建的对象实例的原型对象
+
+        - 优点：可以让所有对象实例共享它包含的属性和方法
+
+        - 缺点：这种共享对于函数很合适，然而，对于包含引用类型值的属性来说，就会有问题了
+
+            ```
+                function Person() {
+
+                }
+                Person.prototype.name = 'Nicholas'
+                Person.prototype.age = 24
+                Person.prototype.job = 'software engineer'
+                Person.prototype.friends = ['shelby', 'court']
+                Person.prototype.sayName = function() {
+                        console.log(this.name)
+                    }
+
+                let person1 = new Person()
+                person1.sayName()  // 'Nicholas'
+
+                let person2 = new Person()
+                person2.sayName()  // 'Nicholas'
+
+                console.log(person1.sayName == person2.sayName)  // true
+            ```
 
     - 组合使用构造函数和原型模式
 
@@ -275,7 +399,160 @@
     - 稳妥构造函数模式
 
 - 继承
-##### 一、原型、原型链、继承
+##### 一、原型对象
 
+- 原型对象
+
+    - 无论什么时候，只要创建了一个新函数，就会根据一组特定的规则为该函数创建一个 ``prototype`` 属性，这个属性指向函数的原型对象
+
+    - 默认情况下，所有原型对象都会自动获得一个 ``constructor（构造函数）``属性，这个属性包含一个指向 ``prototype`` 属性所在函数的指针
+
+    - 创建构造函数后，其原型对象默认只会取得 ``constructor`` 属性，其他方法都是从 ``Object`` 继承而来的。
+
+    - 通过调用构造函数创建一个新实例后，该实例的内部包含一个指针（内部属性），指向构造函数的原型对象。这个指针叫做 ``[[Prototype]]``，脚本上没有标准的方式访问 ``[[Prototype]]``，但在一些浏览器上，每个对象都支持一个属性 ``__proto__``，通过此可以访问到原型对象
+
+    - 虽然可以通过对象实例访问保存在原型上的值，但不能通过对象实例重写原型中的值。如果在实例上创建一个和原型上同名的属性，那么该属性会在实例上创建，并不会修改原型中这个属性，只会屏蔽掉原型中的属性。 如下：
+
+        ```
+            function Person() {
+
+            }
+            Person.prototype = {
+                constructor: Person,
+                name: 'Nicholas',
+                age: 24,
+                job: 'software enginerr',
+                friends:['shelby', 'court'],
+                sayName: function() {
+                    console.log(this.name)
+                }
+            }
+
+            let person1 = new Person()
+             
+            let person2 = new Person()
+
+            person1.name = 'Greg' // 在实例添加一个和原型同名的 name属性，为其赋值为 'Greg'
+
+            console.log(person1.name) // 'Greg' ， 访问时，会先访问实例，有该属性，则输出
+
+            console.log(person2.name) // 'Nicholas'，访问时，会先访问实例，无该属性，去原型上查找，有，输出
+        ```
+    - 通过使用 ``isPrototypeOf`` 方法来确定对象之间是否有关系
+
+        ```
+            console.log(Person.prototype.isPrototypeOf(person1)) // true
+
+            console.log(Person.prototype.isPrototypeOf(person2)) // true
+        ```
+
+    - 通过使用 ``hasOwnProperty()`` 方法，可以判断访问的是实例属性，还是原型属性
+
+        ```
+            console.log(p1.hasOwnProperty('name')) // true
+
+            console.log(p2.hasOwnProperty('name')) // false
+        ```
+    - ``in`` 操作符
+
+        - 有两种使用方式：
+
+            - 单独使用
+
+                - 通过对象访问给定属性时返回true，无论该属性存在实例还是在原型中
+                
+                    ```
+                        console.log( name in person1) // true
+
+                        console.log( name in person2) // true
+                    ```
+                
+                - ``hasOwnProperty()`` 只在属性存在于实例中才返回 ``true``，所以可以结合二者，来判断给定属性时实例中的属性还是原型中的属性
+
+    - ``for-in`` 循环
+
+        - 返回的是所有能够通过对象访问的、可枚举的属性，既包括存在实例中的属性，也包括存在于原型中的属性。屏蔽了原型中不可枚举的属性（即将 ``[[Enumerable]]`` 标记为 ``false``的属性）
+
+    - ``Object.keys()``
+
+        - 该方法接收一个对象作为参数，返回一个包含所有可枚举属性的字符串数组
+
+        - 遍历实例对象时，并不会枚举原型链上可枚举属性
+
+    - ``Object.getOwnPropertyNames()``
+
+        - 该方法可以得到多有实例属性，无论是否可枚举
+    
+    - 简单的原型语法
+
+        - 以上为原型对象添加属性或方法需要一个个添加，可以以字面量的形式重写整个原型对象
+
+            ```
+            function Person() { }
+
+            Person.prototype = {
+                name: 'Nicholas',
+                job: 'software engineer',
+                friends: ['shelby', 'court'],
+                sayName:  function() {
+                            console.log(this.name)
+                        }
+            }
+
+            ```
+        - 以上这种写法更方便，最终结果也相同，但是 ``constructor`` 属性不再指向 ``Person``，而是指向 ``Object``构造函数,虽然通过 ``instanceof``  操作符还能返回正确的结果，但通过 ``constructor`` 已经无法确定对象的类型了
+
+            ```
+                let p1 = new Person()
+
+                console.log(p1 instanceof Object) // true
+
+                console.log(p1 instanceof Person) // true
+
+                console.log(p1.constructor == Person) // false
+
+                console.log(p1.constructor == Object) // true
+            ```
+            
+        - 也可以通过手动设置 ``constructor`` 的值为 ``Person``，但此时 ``constructor`` 属性的可枚举性变为 ``true``，而原生的 ``constructor`` 属性时不可枚举的
+
+            ```
+            function Person() { }
+
+            Person.prototype = {
+                constructor: Person
+                name: 'Nicholas',
+                job: 'software engineer',
+                friends: ['shelby', 'court'],
+                sayName:  function() {
+                            console.log(this.name)
+                        }
+            }
+
+            ```
+        - 当然可以使用 ``Object.defineProperty()``重设构造函数，只适用于 ``ECMAScript``兼容的浏览器
+
+            ```
+            Object.defineProperty(Person.prototype, 'constructor', {
+                enumerable: false,
+                value: Person
+            })
+
+            ```
+    - 原型的动态性
+
+        - 在原型上查找值的过程试一次搜索，因此我们对原型对象所做的任何修改都能够立即从市里上反映出来，即使是先创建实例后修改原型也是如此
+
+            ```
+            let p2 = new Person()
+            Person.prototype.sayHi = function() {
+                console.log('hi')
+            }
+            p2.sayHi()    // 'hi'
+            
+            这是由于实例与原型之间的松散连接关系，当调用
+            
+            ```
+        
 ##### 二、闭包、作用域、垃圾回收机制
 ##### 三、

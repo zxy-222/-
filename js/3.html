@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>原型对象</title>
+</head>
+<body>
+    
+</body>
+<script>
+    function Person() {
+
+    }
+    Person.prototype.name = 'lili'
+    Person.prototype.age = 18
+    Person.prototype.sayName =  function() { console.log(this.name)}
+    
+    let p1 = new Person()
+    p1.name = 'huhu'
+    let p2 = new Person()
+    console.log(p1.__proto__ == Person.prototype) // true
+
+    console.log(Person.prototype.constructor == Person) // true
+
+    console.log(p1.name) // 'huhu'， 实例上添加与原型中同名属性，并不会重写原型上该属性，只是屏蔽掉原型上该属性，访问该属性时，会先从实例上访问，如果有，则输出
+    console.log(p2.name) // 'lili' 实例上没该属性，再去原型上访问
+
+    /* isPrototypeOf*/
+    console.log(Person.prototype.isPrototypeOf(p1)) // true
+    console.log(Person.prototype.isPrototypeOf(p2)) // true
+
+    /* hasOwnProperty() 方法*/
+    console.log(p1.hasOwnProperty('name'))  // true
+    console.log(p2.hasOwnProperty('name'))  // false
+
+    /* in 操作符 */
+    //单独使用，通过对象访问给定属性时返回 true，无论该属性存在于实例还是原型
+
+    console.log('name' in p1) // true
+    console.log('name' in p2) // true
+
+    /*for-in*/
+    // for-in 遍历会返回能够通过对象访问的、可枚举的实例和原型中的属性
+    for(let prop in Person.prototype){
+        console.log(prop)
+    }
+    for(let prop in p1) {
+        console.log(prop)
+    }
+    /*Object.keys()*/
+
+    console.log(Object.keys(Person.prototype)) // ["name", "age", "sayName"]
+
+    console.log(Object.keys(p1)) // ["name"]
+
+    /*Object.getOwnPropertyNames()*/
+    
+    console.log(Object.getOwnPropertyNames(Person.prototype)) // ["constructor", "name", "age"], 会把不可枚举属性 constructor遍历出来
+
+    console.log(Object.getOwnPropertyNames(p1))
+
+    /*如果以字面量形式重写整个原型对象*/
+    Person.prototype = {
+        name: 'lili',
+        age: 18,
+        sayName: function() {
+            console.log(this.name)
+        }
+    }
+    // 但是这相当于重新创建一个对象，结果虽然一样，但是contructor不在指向Person, 而是指向 Object构造函数，不能通过constructor确定对象的类型了
+    console.log(Person.prototype.constructor == Person)  // false
+    console.log(Object.getOwnPropertyNames(Person.prototype)) // ["name", "age", "sayName"]
+    
+    // 当然也可以手动设置constructor的值为Person,但是此时constructor属性的可枚举性变为 true
+    Person.prototype = {
+        constructor: Person,
+        name: 'lili',
+        age: 18,
+        sayName: function() {
+            console.log(this.name)
+        }
+    }
+
+    let a = {
+        name: 'lili'
+    }
+    let b = {
+        age: 18
+    }
+    b.name = 'huhu'
+    
+    console.log(a)
+</script>
+</html>
