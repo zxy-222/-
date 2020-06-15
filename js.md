@@ -838,13 +838,132 @@
 
         ```
 
+    - 该继承方式避免了原型链和借用构造函数的缺陷，融合了它们的有点，成为 ``JavaScript`` 中最常用的继承模式。而且 ``instacneof`` 和 ``isPrototypeOf()`` 也能够用于识别基于组合继承创建的对象
+
+    - 缺点：无论什么情况下都会调用两次超类型构造函数，一次是在创建子类型原型的时候，另一次是在子类型构造函数内部。
+
 - 原型式继承
 
-    
+    - 借助原型可以基于已有的对象创建新对象，还不必因此创建自定义类型。
+
+        ```
+        function object(o) {
+            function F(){ }
+            F.prototype = o;
+            return new F()
+        }
+        
+        在object() 函数内部，先创建一个临时性的构造函数，然后将传入的对象作为这个构造函数的原型，最后返回这个临时类型的一个新实例
+
+        ```
+    - 这种方式，要求必须有一个对象作为基础，可以传递给 ``object()`` 函数，然后再根据具体需求对得到的对象加以修改。
+
+    - ``ECMAScript5`` 通过新增 ``Object.create()`` 方法规范化了原型式继承。这个方法接收两个参数：一个用作新对象原型的对象和（可选的）一个为新对象定义额外属性的对象。在传入一个参数的情况下， ``Object.create()`` 和 ``object()`` 方法的行为相同
+
+        ```
+        let person = {
+            name: 'Nicholas',
+            friends: ['Shelby', 'Court', 'Van']
+        }
+
+        let anotherPerson = Object.create(person)
+        anotherPerson.name = 'Greg'
+        anotherPerson.friends.push('Rob')
+
+        let yetAnotherPerson = Object.create(person)
+        yetAnotherPerson.name = 'Linda'
+        yetAnotherPerson.friends.push('Barbie')
+
+        console.log(person.friends); // "Shelby, Court,Van,Rob, Barbie"
+
+        ```
+
+    - ``Object.create()`` 方法的第二个参数与 ``Object.defineProperties()`` 方法的第二个参数格式上相同： 每个属性都是通过自己的描述定义的。以这种方式指定的任何属性都会覆盖原型对象上的同名属性。
+
+        ```
+        let person = {
+            name: 'Nicholas',
+            friends: ['Shelby', 'Court', 'Van']
+        }
+
+        let anotherPerson = Object.create(person, {
+            name: {
+                value: 'Greg'
+            }
+        })
+
+        console.log(anotherPerson.name) // 'Greg'
+
+        ```
 
 - 寄生式继承
 
+    - 该模式与寄生构造函数和工厂模式类似，即创建一个仅用于封装继承过程的函数，该函数在内部以某种方式来增强对象，最后再返回对象
+
+        ```
+        function creatAnother(original) {
+            let clone = object(original) // 通过调用函数创建一个对象
+            clone.sayHi = function() {
+                console.log('hi')
+            }
+            return clone
+        }
+        以上例子中，createAnother()函数接收一个参数，将其作为新对象基础的对象。然后把这个对象（original）传递给object()函数，将返回的值赋给clone。再为clone对象添加方法，最后返回clone对象
+
+        let person = {
+            name: 'Nicholas',
+            friends:['Shelby', 'Court', 'Van']
+        }
+
+        let anotherPerson = createAnother(person)
+        anotherPerson.sayHi()  // 'hi'
+
+        ```
+
+    - 在主要考虑对象而不是自定义类型和构造函数的情况下，该模式也是一种有用的模式。前面示范继承模式时使用的 ``object()`` 函数不是必需的；任何能够返回新对象的函数都适用于该模式
+
+    - 使用该模式为对象添加函数，会由于不能做到函数复用而降低效率，这一点与构造函数类似
+
 - 寄生组合式继承
 
+    - 通过借用构造函数来继承属性，通过原型链的混成形式来继承方法。
+    
+    - 即不必为了指定子类型的原型而调用超类型的构造函数，需要的无非是超类型原型的一个副本而已
+
+        ```
+        function inheritPrototype(subType, superType) {
+            let prototype = object(superType.prototype)  // 创建对象
+            prototype.constructor = subType;             // 增强对象
+            subType.prototype = ptototype
+        }
+        
+        以上这个函数实现了寄生组合式继承的最简单形式。这个函数接收两个参数：子类型构造函数和超类型改造函数。在函数内部，首先是创建超类型原型的一个副本。再是为创建副本添加 constructor属性，从而弥补因重写原型而失去的默认的constructor属性。最后是将新创建的对象（即副本）赋值给子类型的原型
+        ```
+
+        ```
+        function SuperType(name) {
+            this.name = name
+            this.colors = ['red', 'blue', 'green']
+        }
+        SuperType.prototype.sayName = function() {
+            console.log(this.name)
+        }
+
+        function SubType(name, age) {
+            SuperType.call(this, name)
+            
+            this.age = age
+        }
+
+        inheritPrototype(SubType, SuperType)
+
+        SubType.prototype.sayAge = function() {
+            console.log(this.age)
+        }
+        以上这个例子的高效率体现在它只调用了一次 SuperType 构造函数，并且因此避免了在 SubType.prototype 上面创建不必要、多余的属性。此外，原型链还能保持不变；因此还能够正常使用 instanceof 和 isPrototypeOf()
+
+        ```
+
 ##### 二、闭包、作用域、垃圾回收机制
+
 ##### 三、
