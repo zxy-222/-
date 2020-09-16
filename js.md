@@ -964,6 +964,135 @@
 
         ```
 
-##### 二、闭包、作用域、垃圾回收机制
+##### 六、递归、闭包、this对象
 
-##### 三、
+- 递归
+
+    - 递归函数是在一个函数通过名字调用自身的情况下构成的
+
+        ```
+        function factorial(num) {
+            if(num < 1) {
+                return 1
+            } eles {
+                return num * factorial(num - 1)
+            }
+        }
+
+        以上例子是一个递归阶乘函数，虽然看起来没什么问题，但是如下会导致问题
+
+        let anotherFactorial = factorail;
+        factorial = null
+        console.log(anotherFactorial(4)) // 出错
+
+        以上代码中，调用anotherFactorial()时，先要执行factorial(),而factorial设置为null，不再是函数，所以会导致出错
+
+        ```
+    - ``arguments.callee`` 是一个指向正在执行的函数的指针，可以用它来实现递归的调用
+
+        ```
+        function factorial(num) {
+            if(num < 1) {
+                return 1
+            } else {
+                return num * arguments.callee(num - 1)
+            }
+        }
+
+        ```
+
+- 闭包
+
+    - 是指有权访问另一个函数作用域中的变量的函数，创建闭包的常见方式，就是在一个函数内部创建另一个函数。
+
+        ```
+        function createComparisonFunction(propertyName) {
+            return function (o1, o2) {
+                let v1 = o1[propertyName]
+                let v2 = o2[propertyName]
+                if(v1 < v2 ) {
+                    return - 1
+                } else {
+                    return 0
+                }
+            }
+        }
+
+        ```
+
+    - 由于闭包携带包含它的函数的作用域，因此会比其他函数占用更多的内存。过度使用闭包可能会导致内存占用过度。
+
+- this对象
+
+    - ``this`` 对象是在运行时基于函数的执行环境绑定的
+
+        - 在全局函数中，``this`` 等于 ``window``
+
+        - 当函数被称作为某个对象的方法调用时，``this`` 等于那个对象
+
+##### 七、事件
+
+``JavaScript`` 和 ``HTML`` 的交互时通过 ***事件*** 实现的
+
+- 事件流
+
+    - ***事件流*** 描述的是从页面中接收事件的顺序。 ``IE`` 的事件流是事件冒泡，而 ``Netscape Communicator`` 的事件流是事件捕获
+
+    - 事件冒泡
+
+        ``IE`` 的事件流叫做时间冒泡（event bubbling），即事件开始时由最具体的元素接收，然后逐级向上传播到较为不具体的节点
+
+            ```
+            <!DOCTYPE html>
+            <html>
+                <head>
+                    <title></title>
+                </head>
+                <body>
+                    <div id="myDiv"> Click Me </div>
+                </body>
+            </html>
+            
+            单击页面中的div元素，则click事件会按照如下顺序传播
+            1) <div>
+            2) <body>
+            3) <html>
+            4) document
+
+            ```
+
+    - 事件捕获
+
+        事件捕获的思想是不太具体的节点应该更早接收到事件，而最具体的节点应该最后接收到事件。事件捕获的用意在于在事件到达预定目标前捕获它。
+
+            ```
+            以上面的HTML页面点击事件为例，则单击div元素则会以一下顺序触发click事件
+            1) document
+            2) <html>
+            3) <body>
+            4) <div>
+            ```
+
+    - DOM事件流
+
+        - ``DOM2`` 级事件，规定的事件流包括三个阶段：事件捕获阶段、处于目标阶段、事件冒泡阶段。
+
+        - 在 ``DOM`` 事件流中，实际的目标（ ``<div>`` 元素）在捕获阶段不会接收到事件。这意味着在捕获阶段，时间从 ``document`` 到 ``<html>`` 再到 ``<body>`` 后停止了。下一阶段是 '处于目标'阶段，于是事件在 ``<div>`` 上发生，并在事件处理中被看成冒泡阶段的一部分。然后，冒泡阶段发生，事件又传播会文档
+
+        - 多数支持 ``DOM`` 事件流的浏览器都实现了一种特定的行为，即使 ``DOM2`` 级事件规范明确要求捕获阶段不会涉及时间目标，但一些浏览器都会在捕获阶段触发事件对象上的事件。结果，就是有两个机会在目标对象上面操作事件
+
+- 事件处理程序
+
+    事件就是用户或浏览自身执行的某种动作。而响应某个事件的函数就叫做 ***事件处理程序***
+
+    - ``HTML`` 事件处理程序
+    
+        - 某个元素支持的每种事件，都可以使用一个与相应事件处理程序同名的 ``HTML``特性来指定。这个特性的值应该是能够执行的 ``JavaScript``代码
+
+    - ``DOM0`` 级事件处理程序
+
+    - ``DOM2`` 级事件处理程序
+
+    - ``IE`` 事件处理程序
+
+    - 跨浏览器事件处理程序
