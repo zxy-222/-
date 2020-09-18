@@ -263,3 +263,69 @@
   - 长列表滚动到可视区域动态加载
 
   - 图片懒加载
+
+### 二十四、组件属性透传
+ 
+  - 通过 ``v-bind="$props"`` 以及 ``v-bind="$attrs"`` 实现属性透传
+
+    - 例如：我们写一些嵌套组件，A的子组件是B，B的子组件是C。这个时候A传递 ``props`` 给B，B又传给C
+
+    ```
+      <template>
+        <child-component
+          :props1="props1"
+          :props2="props2"
+          :props3="props3"
+        >
+        </child-component>
+      </template>
+
+      以上可以直接使用 v-bind: $props代替
+
+      <template>
+        <child-component v-bind="$props"></child-component>
+      </template>
+
+      也可以利用v-bind 传入一个对象的所有property，类似v-bind="Obj"。对于一个给定的对象post
+      
+      post: {
+        id: 1,
+        title: 'vue'
+      }
+      可以直接使用以下的代码
+      <post-component v-bind="post"></post-component>
+
+      等价于：
+      <post-component 
+        v-bind:id="post.id"
+        v-bind:title="post.title"
+      >
+      </post-component>
+    ```
+
+### 二十五、v-once 和 v-pre 提升性能
+
+  - ``Vue`` 的性能优化很大部分是在编译这一块，``Vue`` 源码有类似标记静态节点的操作，在 ``patch`` 的过程中跳过编译，从而提升性能。另外，``Vue`` 提供了 ``v-pre`` 给我们去决定要不要跳过这个元素和它子元素的编译过程。可以用来显示 ``Mustache`` 标签。跳过大量没有指令的节点会加快编译
+
+  ```
+    例如：
+    <div v-pre>{{msg}}</div> // 即使data中已经定义了msg，遮脸展示的仍是 {{msg}}
+  ```
+
+  - 如果只渲染元素或组件一次，此后的重新渲染，元素/组件及其所有的子节点将被视为静态内容并跳过。可以使用 ``v-once``
+
+  ```
+    例如：
+      <div v-once>{{msg}}</div> // 只会渲染一次，此后在更改msg的值，也不会重新渲染
+
+  ```
+
+### 二十六、使用Vue.observable实现状态共享
+
+  - ``Vuex`` 就是专门用来解决多组件状态共享的情况，不过如果应用不够大，为避免代码繁琐冗余，最好不要使用
+
+  - ``Vue.observable(object)`` 让一个对象可响应。``Vue`` 内部会用它来处理 ``data`` 函数返回的对象。返回的对象可以直接用于渲染函数和计算属性，并且会在发生变更时触发相应的更新。也可以作为最小化的夸组件状态存储器，用于简单的场景
+
+  ```
+  ```
+
